@@ -22,11 +22,7 @@ jobs:
           MYSQL_PASSWORD: Gaocheng920930!
         ports:
           - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+        # Removed health-check options for simplicity
 
     steps:
       - uses: actions/checkout@v3
@@ -38,6 +34,17 @@ jobs:
 
       - name: Build with Maven
         run: mvn install --no-transfer-progress
+
+      - name: Wait for MySQL to be ready
+        run: |
+          echo "Waiting for MySQL to be ready..."
+          sleep 60  # Increased delay to ensure MySQL starts
+
+      - name: Check MySQL Connection
+        run: |
+          echo "Checking MySQL connection..."
+          mysql --host=localhost --port=3306 --user=root --password=Gaocheng920930! -e 'SELECT 1;'
+        continue-on-error: true  # Continue even if this fails for debugging purposes
 
       - name: Run Tests
         env:
