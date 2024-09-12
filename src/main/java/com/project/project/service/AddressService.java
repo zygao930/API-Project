@@ -2,51 +2,148 @@ package com.project.project.service;
 
 import com.project.project.dao.AddressDao;
 import com.project.project.entity.Address;
+import com.project.project.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
-import javax.transaction.Transactional;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
-public class AddressService {
+public class AddressService implements BaseService<Address, String> {
 
     @Autowired
     private AddressDao addressDao;
-    @Autowired
-    private DataSource dataSource;
 
-    @Transactional
-    public Address saveAndReturnWithId(Address address) {
-        addressDao.save(address);
-
-        // Retrieve the generated ID from the database
-        String id = retrieveGeneratedId(address);
-
-        // Update the entity with the generated ID
-        address.setId(id);
-        return addressDao.save(address);
+    @Override
+    public Address find(String id) {
+        return addressDao.findById(id).orElse(null);
     }
 
-    private String retrieveGeneratedId(Address address) {
-        String id = null;
-        // Assuming you have a JdbcTemplate or a Connection bean available
-        try (Connection connection = dataSource.getConnection();
-                     PreparedStatement statement = connection.prepareStatement("SELECT LAST_INSERT_ID()")) {
+    @Override
+    public List<Address> findAll() {
+        return addressDao.findAll();
+    }
 
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    id = resultSet.getString(1); // Retrieve the generated ID
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // Handle the exception properly
+    @Override
+    public List<Address> findList(String[] ids) {
+        List<String> idList = Arrays.asList(ids);
+        return addressDao.findAllById(idList);
+    }
+
+    @Override
+    public List<Address> findList(Iterable<String> ids) {
+        return addressDao.findAllById(ids);
+    }
+
+    @Override
+    public Page<Address> findAll(Pageable pageable) {
+        return addressDao.findAll(pageable);
+    }
+
+    @Override
+    public Page<Address> findAll(Specification<Address> spec, Pageable pageable) {
+        return addressDao.findAll(spec, pageable);
+    }
+
+    @Override
+    public Address findOne(Specification<Address> spec) {
+        return addressDao.findOne(spec).orElse(null);
+    }
+
+    @Override
+    public long count() {
+        return addressDao.count();
+    }
+
+    @Override
+    public long count(Specification<Address> spec) {
+        return addressDao.count(spec);
+    }
+
+    @Override
+    public boolean exists(String id) {
+        return addressDao.existsById(id);
+    }
+
+    @Override
+    public void save(Address entity) {
+        if (entity.getId() == null) {
+            String newId;
+            do {
+                newId = IdGenerator.generateId("Address");
+            } while (addressDao.existsById(newId));
+            entity.setId(newId);
         }
-        return id;
+        addressDao.save(entity);
+    }
+
+    @Override
+    public void save(List<Address> entities) {
+        entities.forEach(entity -> {
+            if (entity.getId() == null) {
+                String newId;
+                do {
+                    newId = IdGenerator.generateId("Address");
+                } while (addressDao.existsById(newId));
+                entity.setId(newId);
+            }
+        });
+        addressDao.saveAll(entities);
+    }
+
+    @Override
+    public Address update(Address entity) {
+        // Assuming update is the same as save for simplicity
+        return addressDao.save(entity);
+    }
+
+    @Override
+    public void delete(String id) {
+        addressDao.deleteById(id);
+    }
+
+    @Override
+    public void deleteByIds(List<String> ids) {
+        addressDao.deleteAllById(ids);
+    }
+
+    @Override
+    public void delete(Address[] entities) {
+        addressDao.deleteAll(Arrays.asList(entities));
+    }
+
+    @Override
+    public void delete(Iterable<Address> entities) {
+        addressDao.deleteAll(entities);
+    }
+
+    @Override
+    public void delete(Address entity) {
+        addressDao.delete(entity);
+    }
+
+    @Override
+    public void deleteAll() {
+        addressDao.deleteAll();
+    }
+
+    @Override
+    public List<Address> findList(Specification<Address> spec) {
+        return addressDao.findAll(spec);
+    }
+
+    @Override
+    public List<Address> findList(Specification<Address> spec, Sort sort) {
+        return addressDao.findAll(spec, sort);
+    }
+
+    @Override
+    public void flush() {
+        addressDao.flush();
     }
 }
