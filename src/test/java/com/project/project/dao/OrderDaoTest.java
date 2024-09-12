@@ -17,6 +17,7 @@ public class OrderDaoTest {
     private OrderDao orderDao;
 
     @Test
+    @org.junit.jupiter.api.Order(4)
     public void testSaveAndFind() {
         // Arrange
         Order order = new Order();

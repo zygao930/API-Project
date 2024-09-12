@@ -50,16 +50,4 @@ public class Order implements BaseEntity {
 
     @Column(name = "UPDATE_TIME", nullable = false)
     private LocalDate updateTime;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID", insertable = false, updatable = false)
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "GOODS_ID", referencedColumnName = "GOODS_ID", insertable = false, updatable = false)
-    private Product product;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ADDRESS_ID", referencedColumnName = "ADDRESS_ID", insertable = false, updatable = false)
-    private Address address;
 }
