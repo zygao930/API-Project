@@ -1,0 +1,55 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: 商品用户地址订单
+          MYSQL_USER: root
+          MYSQL_PASSWORD: Gaocheng920930!
+        ports:
+          - 3306:3306
+        # Removed health-check options for simplicity
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Amazon Corretto JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'corretto'  
+
+      - name: Build with Maven
+        run: mvn install --no-transfer-progress
+
+      - name: Wait for MySQL to be ready
+        run: |
+          echo "Waiting for MySQL to be ready..."
+          sleep 60  # Increased delay to ensure MySQL starts
+
+      - name: Check MySQL Connection
+        run: |
+          echo "Checking MySQL connection..."
+          mysql --host=localhost --port=3306 --user=root --password=Gaocheng920930! -e 'SELECT 1;'
+        continue-on-error: true  # Continue even if this fails for debugging purposes
+
+      - name: Run Tests
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/商品用户地址订单?useUnicode=true&characterEncoding=utf-8
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: Gaocheng920930!
+        run: mvn test
