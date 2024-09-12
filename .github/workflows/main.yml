@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '8'
-          distribution: 'corretto'  
+          distribution: 'corretto'
 
       - name: Build with Maven
         run: mvn install --no-transfer-progress
@@ -40,16 +40,20 @@ jobs:
         run: |
           echo "Waiting for MySQL to be ready..."
           sleep 60  # Increased delay to ensure MySQL starts
+          # Additional MySQL readiness check
+          until mysql --host=localhost --port=3306 --user=root --password=Gaocheng920930! -e 'SELECT 1;' &> /dev/null; do
+            echo "Waiting for MySQL..."
+            sleep 5
+          done
 
       - name: Check MySQL Connection
         run: |
           echo "Checking MySQL connection..."
           mysql --host=localhost --port=3306 --user=root --password=Gaocheng920930! -e 'SELECT 1;'
-        continue-on-error: true  # Continue even if this fails for debugging purposes
 
       - name: Run Tests
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/商品用户地址订单?useUnicode=true&characterEncoding=utf-8
           SPRING_DATASOURCE_USERNAME: root
           SPRING_DATASOURCE_PASSWORD: Gaocheng920930!
-        run: mvn test
+        run: mvn run  # Enable debug logging for Maven tests
