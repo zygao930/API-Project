@@ -25,8 +25,8 @@ public class UserDaoTest {
         User user = new User();
         user.setId(IdGenerator.generateId("User"));
 
-        user.setUserId("U123");
-        user.setEmail("test@example.com");
+        user.setUserId("B3");
+        user.setEmail("test2@example.com");
         user.setPassword("securePassword123");
         user.setNickName("TestUser");
         user.setGender("Male");
@@ -42,8 +42,8 @@ public class UserDaoTest {
 
         // Assert
         assertThat(foundUser).isNotNull();
-        assertThat(foundUser.getUserId()).isEqualTo("U123");
-        assertThat(foundUser.getEmail()).isEqualTo("test@example.com");
+        assertThat(foundUser.getUserId()).isEqualTo("B3");
+        assertThat(foundUser.getEmail()).isEqualTo("test2@example.com");
         assertThat(foundUser.getPassword()).isEqualTo("securePassword123");
         assertThat(foundUser.getNickName()).isEqualTo("TestUser");
         assertThat(foundUser.getGender()).isEqualTo("Male");

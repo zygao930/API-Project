@@ -24,7 +24,7 @@ public class ProductDaoTest {
         Product product = new Product();
         product.setId(IdGenerator.generateId("Product"));
 
-        product.setGoodsId("G123");
+        product.setGoodsId("G12");
         product.setGoodsName("Test Product");
         product.setOriginalPrice(new BigDecimal("100.00"));
         product.setDiscountPrice(new BigDecimal("80.00"));
@@ -46,7 +46,7 @@ public class ProductDaoTest {
 
         // Assert
         assertThat(foundProduct).isNotNull();
-        assertThat(foundProduct.getGoodsId()).isEqualTo("G123");
+        assertThat(foundProduct.getGoodsId()).isEqualTo("G12");
         assertThat(foundProduct.getGoodsName()).isEqualTo("Test Product");
         assertThat(foundProduct.getOriginalPrice()).isEqualByComparingTo(new BigDecimal("100.00"));
         assertThat(foundProduct.getDiscountPrice()).isEqualByComparingTo(new BigDecimal("80.00"));

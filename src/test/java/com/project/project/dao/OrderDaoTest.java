@@ -22,7 +22,7 @@ public class OrderDaoTest {
         // Arrange
         Order order = new Order();
         order.setId(IdGenerator.generateId("Order"));
-        order.setOrderId("O123456");
+        order.setOrderId("O12");
         order.setUserId("U123");
         order.setGoodsId("G123");
         order.setPurchase(new BigDecimal(1)); // Assuming a single unit purchase
@@ -40,7 +40,7 @@ public class OrderDaoTest {
 
         // Assert
         assertThat(foundOrder).isNotNull();
-        assertThat(foundOrder.getOrderId()).isEqualTo("O123456");
+        assertThat(foundOrder.getOrderId()).isEqualTo("O12");
         assertThat(foundOrder.getUserId()).isEqualTo("U123");
         assertThat(foundOrder.getGoodsId()).isEqualTo("G123");
         assertThat(foundOrder.getPurchase()).isEqualTo(new BigDecimal(1));

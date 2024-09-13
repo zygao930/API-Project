@@ -23,8 +23,8 @@ public class AddressDaoTest {
         Address address = new Address();
         address.setId(IdGenerator.generateId("Address"));
 
-        address.setAddressId("A5");
-        address.setName("Johmmy");
+        address.setAddressId("A9");
+        address.setName("Bill");
         address.setPhone("1123456789");
         address.setDetailedAddress("123 Test St");
         address.setState("CA");
@@ -41,7 +41,7 @@ public class AddressDaoTest {
 
         // Assert
         assertThat(foundAddress).isNotNull();
-        assertThat(foundAddress.getName()).isEqualTo("Johmmy");
+        assertThat(foundAddress.getName()).isEqualTo("Bill");
         assertThat(foundAddress.getPhone()).isEqualTo("1123456789");
         assertThat(foundAddress.getDetailedAddress()).isEqualTo("123 Test St");
         assertThat(foundAddress.getState()).isEqualTo("CA");
