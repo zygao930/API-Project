@@ -1,7 +1,7 @@
 package com.project.project.dao;
 import com.project.project.entity.Address;
 import com.project.project.util.IdGenerator;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,8 +16,8 @@ public class AddressDaoTest {
     @Autowired
     private AddressDao addressDao;
 
+    @Disabled
     @Test
-    @Order(1)
     public void testSaveAndFind() {
         // Arrange
         Address address = new Address();

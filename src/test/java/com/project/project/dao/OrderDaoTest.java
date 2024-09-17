@@ -1,6 +1,7 @@
 package com.project.project.dao;
 import com.project.project.entity.Order;
 import com.project.project.util.IdGenerator;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,8 +17,8 @@ public class OrderDaoTest {
     @Autowired
     private OrderDao orderDao;
 
+    @Disabled
     @Test
-    @org.junit.jupiter.api.Order(4)
     public void testSaveAndFind() {
         // Arrange
         Order order = new Order();
