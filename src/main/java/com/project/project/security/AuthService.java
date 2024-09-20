@@ -5,25 +5,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
-
-import static com.project.project.security.RSAEncrypt.decrypt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class AuthService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private CustomizeUserDetailsService userDetailsService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -31,77 +27,55 @@ public class AuthService {
     @Autowired
     private TokenService tokenService;
 
-    private PrivateKey getPrivateKey() throws Exception {
-        String privateKeyBase64 = System.getenv("RSA_PRIVATE_KEY");
-
-        if (privateKeyBase64 == null || privateKeyBase64.isEmpty()) {
-            throw new CommonException(500, "Private key not configured"); // Internal server error
-        }
-        System.out.println("Private Key Base64: " + privateKeyBase64); // Debugging purpose
-
+    /**
+     * Handles the login process: Captcha validation, user lookup, and token generation.
+     * @param nickName The user's nickname.
+     * @param captcha The captcha provided by the user.
+     * @param captchaKey The key to retrieve the captcha from Redis.
+     * @return ResponseEntity with either success or error message.
+     */
+    public ResponseEntity<String> login(String nickName, String captcha, String captchaKey) {
         try {
-            byte[] keyBytes = Base64.getDecoder().decode(privateKeyBase64);
-            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            return keyFactory.generatePrivate(spec);
-        } catch (Exception e) {
-            // Log the exception and rethrow with more context
-            System.err.println("Error while loading private key: " + e.getMessage());
-            throw new CommonException(500, "Error loading private key");
-        }
-    }
-
-    public ResponseEntity<String> login(String username, String encryptedPassword, String captcha, String captchaKey) {
-        try {
-            // 1. Validate the captcha from Redis
+            // Validate the captcha from Redis
             String storedCaptcha = redisTemplate.opsForValue().get(captchaKey);
             if (storedCaptcha == null) {
-                throw new CommonException(300, "验证码已过期"); // "Captcha error or expired"
+                logger.warn("Captcha for key {} not found in Redis", captchaKey);
+                throw new CommonException(300, "Captcha error or expired");
             }
-
             if (!storedCaptcha.equals(captcha)) {
-                throw new CommonException(301, "验证码错误"); // "Captcha incorrect"
+                logger.warn("Captcha mismatch for key {}: expected {}, got {}", captchaKey, storedCaptcha, captcha);
+                throw new CommonException(300, "Captcha error or expired");
             }
 
-            // 2. Decrypt the password using the RSA private key
-            PrivateKey privateKey = getPrivateKey();
-            String decryptedPassword = RSAEncrypt.decrypt(encryptedPassword, privateKey);
-
-            // 3. Retrieve user information using UserDetailsService
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            // 4. Validate the decrypted password with the stored password
-            if (!passwordEncoder.matches(decryptedPassword, userDetails.getPassword())) {
-                throw new CommonException(401, "Invalid username or password"); // "Username or password incorrect"
+            // Retrieve user information from database
+            UserDetails userDetails = userDetailsService.loadUserByUsername(nickName);
+            if (userDetails == null) {
+                logger.error("User with nickname {} not found", nickName);
+                throw new CommonException(404, "User not found");
             }
 
-            // 5. Check if the user is already logged in by checking Redis
-            String existingToken = redisTemplate.opsForValue().get("auth:token:" + username);
-            if (existingToken != null) {
-                // If user is already logged in, invalidate the old session
-                redisTemplate.delete("auth:token:" + username);
-                redisTemplate.delete("auth:user:" + existingToken);
-            }
+            // Normally, you would validate the password here
+            // String password = loginRequest.getPassword();
+            // if (!passwordEncoder.matches(password, userDetails.getPassword())) {
+            //    throw new CommonException(401, "Invalid username or password");
+            // }
 
-            // 6. Generate a new token
+            // Generate and save token in Redis
             String token = tokenService.generateToken(userDetails);
+            logger.info("Generated token for user {}: {}", nickName, token);
 
-            // 7. Store user session and token in Redis
-            redisTemplate.opsForValue().set("auth:token:" + username, token);
-            redisTemplate.opsForValue().set("auth:user:" + token, username);
+            redisTemplate.opsForValue().set(nickName, token);
 
-            // Optional: Set an expiry time for the Redis entries
-            redisTemplate.expire("auth:token:" + username, 1, java.util.concurrent.TimeUnit.HOURS);
-            redisTemplate.expire("auth:user:" + token, 1, java.util.concurrent.TimeUnit.HOURS);
+            System.out.println("User " + nickName + " is now online with token: " + token);
 
-            // 8. Return the token and user info to the client
+            // Return success response with the generated token
             return ResponseEntity.ok("Login successful. Token: " + token);
+
         } catch (CommonException e) {
-            // Handle specific application exceptions
+            logger.error("Error during login: {}", e.getMessage());
             return ResponseEntity.status(e.getCode()).body(e.getMessage());
         } catch (Exception e) {
-            // Handle unexpected errors
-            e.printStackTrace(); // Log the exception
+            logger.error("Internal server error during login: {}", e.getMessage());
             return ResponseEntity.status(500).body("Internal server error: " + e.getMessage());
         }
     }

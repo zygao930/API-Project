@@ -16,10 +16,12 @@ public class UserInfoService {
     private RedisTemplate<String, String> redisTemplate;
 
     public UserDetails loadUserByUsername(String username) throws CommonException {
-        if (!exists(username)) {
-            throw new CommonException(404,"用户不存在");
+        String user = redisTemplate.opsForValue().get("user:" + username);
+        if (user == null) {
+            throw new CommonException(404, "用户不存在");
         }
         return User.withUsername(username).authorities("TEST").password("{noop}123456").build();
     }
+
 
 }

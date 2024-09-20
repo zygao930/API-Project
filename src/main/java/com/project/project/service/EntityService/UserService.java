@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.project.project.util.IdGenerator.generateId;
@@ -186,4 +187,10 @@ public class UserService implements BaseService<User, String> {
     public void flush() {
         userDao.flush();
     }
+
+    public Optional<User> getUserByNickName(String nickName) {
+        System.out.println("Looking for user with nickName: " + nickName);
+        return userDao.findByNickName(nickName);
+    }
+
 }

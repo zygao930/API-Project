@@ -1,42 +1,28 @@
 package com.project.project.security;
 
+import com.project.project.dao.UserDao; // Import your UserDao
+import com.project.project.entity.User; // Import your User entity
 import com.project.project.exception.CommonException;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
-
-import java.util.List;
-
+@Service // Annotate the class to make it a Spring Service
 public class CustomizeUserDetailsService implements UserDetailsService {
-    // 用于模拟从数据库查询
-    private final List<String> usernameList;
 
-    public CustomizeUserDetailsService(List<String> usernameList) {
-        this.usernameList = usernameList;
-    }
+    @Autowired
+    private UserDao userDao; // Inject the UserDao
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        if(!exists(username)) {
-            try {
-                throw new CommonException(404,"用户不存在");
-            } catch (CommonException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        // 此处的TEST表示用户的权限, {xxx}指定密码加密的方式, {noop}表示不加密，采用明文
-        return User.withUsername(username).authorities("TEST").password("{noop}123456").build();
+    public UserDetails loadUserByUsername(String nickName) throws UsernameNotFoundException {
+        User user = userDao.findByNickName(nickName)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return org.springframework.security.core.userdetails.User.withUsername(user.getNickName())
+                .password(user.getPassword())
+                .authorities("ROLE_USER")
+                .build();
     }
 
-    private boolean exists(String username) {
-        boolean exist = false;
-        for(String item : usernameList) {
-            if(item.equals(username)) {
-                exist = true;
-                break;
-            }
-        }
-        return exist;
-    }
 }
