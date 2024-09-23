@@ -2,150 +2,96 @@ package com.project.project.service.EntityService;
 
 import com.project.project.dao.ProductDao;
 import com.project.project.entity.Product;
-import com.project.project.entity.User;
-import com.project.project.util.IdGenerator;
+import com.project.project.exception.CommonException;
+import com.project.project.util.ProductRegistrationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static com.project.project.util.IdGenerator.generateId;
 
 @Service
-public class ProductService implements BaseService<Product, String> {
+public class ProductService {
 
     @Autowired
     private ProductDao productDao;
 
-    @Override
+    public String addNewProduct(ProductRegistrationDTO registrationDTO) throws CommonException {
+        System.out.println("Adding new product: " + registrationDTO.getGoodsName());
+
+        // Check if the product ID already exists
+        if (productDao.existsById(registrationDTO.getGoodsName())) {
+            throw new CommonException(100, "Goods ID already in use");
+        }
+
+        // Create new Product entity
+        Product product = new Product();
+        product.setGoodsName(registrationDTO.getGoodsName());
+        product.setOriginalPrice(registrationDTO.getOriginalPrice());
+        product.setDiscountPrice(registrationDTO.getDiscountPrice());
+        product.setMasterImg(registrationDTO.getMasterImg());
+        product.setIntro(registrationDTO.getIntro());
+        product.setAddress(registrationDTO.getAddress());
+        product.setBeginTime(registrationDTO.getBeginTime());
+        product.setEndTime(registrationDTO.getEndTime());
+        product.setPostage(registrationDTO.getPostage());
+        product.setInventory(registrationDTO.getInventory());
+        product.setSaleVolume(registrationDTO.getSaleVolume());
+        product.setVideoUrl(registrationDTO.getVideoUrl());
+
+        product.setId(generateId("Product"));
+        product.setGoodsId(UUID.randomUUID().toString());
+        product.setCreateTime(LocalDate.now());
+        product.setUpdateTime(LocalDate.now());
+
+        productDao.save(product);
+        return "Product added successfully!";
+    }
+
+    public String updateProduct(String id, ProductRegistrationDTO registrationDTO) throws CommonException {
+        Product product = productDao.findById(id)
+                .orElseThrow(() -> new CommonException(404, "Product not found"));
+
+        product.setGoodsName(registrationDTO.getGoodsName());
+        product.setOriginalPrice(registrationDTO.getOriginalPrice());
+        product.setDiscountPrice(registrationDTO.getDiscountPrice());
+        product.setMasterImg(registrationDTO.getMasterImg());
+        product.setIntro(registrationDTO.getIntro());
+        product.setAddress(registrationDTO.getAddress());
+        product.setBeginTime(registrationDTO.getBeginTime());
+        product.setEndTime(registrationDTO.getEndTime());
+        product.setPostage(registrationDTO.getPostage());
+        product.setInventory(registrationDTO.getInventory());
+        product.setSaleVolume(registrationDTO.getSaleVolume());
+        product.setVideoUrl(registrationDTO.getVideoUrl());
+        product.setUpdateTime(LocalDate.now());
+
+        productDao.save(product);
+        return "Product updated successfully!";
+    }
+
+    public String deleteProduct(String id) throws CommonException {
+        Product product = productDao.findById(id)
+                .orElseThrow(() -> new CommonException(404, "Product not found"));
+
+        productDao.delete(product);
+        return "Product deleted successfully!";
+    }
+
     public Product find(String id) {
         return productDao.findById(id).orElse(null);
     }
 
-    @Override
     public List<Product> findAll() {
         return productDao.findAll();
     }
 
-    @Override
-    public List<Product> findList(String[] ids) {
-        List<String> idList = Arrays.asList(ids);
-        return productDao.findAllById(idList);
-    }
-
-    @Override
-    public List<Product> findList(Iterable<String> ids) {
-        return productDao.findAllById(ids);
-    }
-
-    @Override
-    public Page<Product> findAll(Pageable pageable) {
-        return productDao.findAll(pageable);
-    }
-
-    @Override
-    public Page<Product> findAll(Specification<Product> spec, Pageable pageable) {
-        return productDao.findAll(spec, pageable);
-    }
-
-    @Override
-    public Product findOne(Specification<Product> spec) {
-        return productDao.findOne(spec).orElse(null);
-    }
-
-    @Override
-    public long count() {
-        return productDao.count();
-    }
-
-    @Override
-    public long count(Specification<Product> spec) {
-        return productDao.count(spec);
-    }
-
-    @Override
-    public boolean exists(String id) {
-        return productDao.existsById(id);
-    }
-
-    @Override
-    public void save(Product entity) {
-        if (entity.getId() == null) {
-            String newId;
-            do {
-                newId = IdGenerator.generateId("Product");
-            } while (productDao.existsById(newId));
-            entity.setId(newId);
-        }
-        productDao.save(entity);
-    }
-
-    @Override
-    public void save(List<Product> entities) {
-        entities.forEach(entity -> {
-            if (entity.getId() == null) {
-                String newId;
-                do {
-                    newId = IdGenerator.generateId("Product");
-                } while (productDao.existsById(newId));
-                entity.setId(newId);
-            }
-        });
-        productDao.saveAll(entities);
-    }
-
-    @Override
-    public void update(Product entity) {
-        // Assuming update is the same as save for simplicity
-        productDao.save(entity);
-    }
-
-
-    @Override
-    public void delete(String id) {
-        productDao.deleteById(id);
-    }
-
-    @Override
-    public void deleteByIds(List<String> ids) {
-        productDao.deleteAllById(ids);
-    }
-
-    @Override
-    public void delete(Product[] entities) {
-        productDao.deleteAll(Arrays.asList(entities));
-    }
-
-    @Override
-    public void delete(Iterable<Product> entities) {
-        productDao.deleteAll(entities);
-    }
-
-    @Override
-    public void delete(Product entity) {
-        productDao.delete(entity);
-    }
-
-    @Override
-    public void deleteAll() {
-        productDao.deleteAll();
-    }
-
-    @Override
-    public List<Product> findList(Specification<Product> spec) {
-        return productDao.findAll(spec);
-    }
-
-    @Override
-    public List<Product> findList(Specification<Product> spec, Sort sort) {
-        return productDao.findAll(spec, sort);
-    }
-
-    @Override
-    public void flush() {
-        productDao.flush();
+    public Optional<Product> getProductByGoodsId(String goodsId) {
+        System.out.println("Looking for product with goodsId: " + goodsId);
+        return productDao.findById(goodsId);
     }
 }

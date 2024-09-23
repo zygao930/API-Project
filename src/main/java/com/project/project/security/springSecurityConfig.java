@@ -32,7 +32,7 @@ public class springSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/", "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/**/attachment/**", "/profile/**").permitAll()
                 .antMatchers("/api/auth/generateCaptcha", "/api/auth/login").permitAll() // 允许这两个端点
                 .antMatchers("/api/auth/getUserInfo", "/api/auth/logout").permitAll() // 需要身份验证
-                .anyRequest().authenticated() // 其他请求都需要认证
+                .anyRequest().permitAll() // 其他请求都需要认证
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint((request, response, authException) ->

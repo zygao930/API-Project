@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "用户表结构")
@@ -46,4 +47,5 @@ public class User implements BaseEntity {
 
     @Column(name = "UPDATE_TIME", nullable = false)
     private LocalDate updateTime;
+
 }

@@ -5,15 +5,9 @@ import com.project.project.controller.VerificationController;
 import com.project.project.exception.CommonException;
 import com.project.project.util.UserRegistrationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,7 +15,7 @@ import java.util.UUID;
 import static com.project.project.util.IdGenerator.generateId;
 
 @Service
-public class UserService implements BaseService<User, String> {
+public class UserService {
 
     @Autowired
     private UserDao userDao;
@@ -49,10 +43,11 @@ public class UserService implements BaseService<User, String> {
         user.setPaykey(registrationDTO.getPayKey());
         user.setGender(registrationDTO.getGender());
         user.setNickName(registrationDTO.getNickName());
+        user.setBalance(registrationDTO.getBalance());
+        user.setAvatarUrl(registrationDTO.getAvatarUrl());
 
         user.setId(generateId("User"));
         user.setUserId(UUID.randomUUID().toString());
-        user.setBalance(new BigDecimal("0.00"));
         user.setCreateTime(LocalDate.now());
         user.setUpdateTime(LocalDate.now());
         userDao.save(user);
@@ -60,132 +55,64 @@ public class UserService implements BaseService<User, String> {
         return "用户注册成功！";
     }
 
-    @Override
+    public String addUser(UserRegistrationDTO registrationDTO) throws CommonException {
+        System.out.println("Adding new user: " + registrationDTO.getEmail());
+
+        // Check if the email is already used
+        if (userDao.existsByEmail(registrationDTO.getEmail())) {
+            throw new CommonException(100, "Email already in use");
+        }
+
+        // Create new User entity
+        User user = new User();
+        user.setEmail(registrationDTO.getEmail());
+        user.setNickName(registrationDTO.getNickName());
+        user.setPassword(registrationDTO.getPassWord());
+        user.setGender(registrationDTO.getGender());
+        user.setPaykey(registrationDTO.getPayKey());
+        user.setBalance(registrationDTO.getBalance());
+        user.setAvatarUrl(registrationDTO.getAvatarUrl());
+        user.setId(generateId("User"));
+        user.setUserId(UUID.randomUUID().toString());
+        user.setCreateTime(LocalDate.now());
+        user.setUpdateTime(LocalDate.now());
+
+        userDao.save(user);
+        return "User added successfully!";
+    }
+
+    public String updateUser(String id, UserRegistrationDTO registrationDTO) throws CommonException {
+        User user = userDao.findById(id).
+                orElseThrow(() -> new CommonException(404, "User not found"));
+
+        user.setEmail(registrationDTO.getEmail());
+        user.setNickName(registrationDTO.getNickName());
+        user.setPassword(registrationDTO.getPassWord());
+        user.setGender(registrationDTO.getGender());
+        user.setPaykey(registrationDTO.getPayKey());
+        user.setBalance(registrationDTO.getBalance());
+        user.setAvatarUrl(registrationDTO.getAvatarUrl());
+        user.setUpdateTime(LocalDate.now());
+
+        userDao.save(user);
+        return "User updated successfully!";
+    }
+
+    public String deleteUser(String id) throws CommonException {
+        User user = userDao.findById(id).
+                orElseThrow(() -> new CommonException(404, "User not found"));
+
+        userDao.delete(user);
+        return "User deleted successfully!";
+    }
+
     public User find(String id) {
         return userDao.findById(id).orElse(null);
     }
 
-    @Override
     public List<User> findAll() {
-        return userDao.findAll();
-    }
-
-    @Override
-    public List<User> findList(String[] ids) {
-        List<String> idList = Arrays.asList(ids);
-        return userDao.findAllById(idList);
-    }
-
-    @Override
-    public List<User> findList(Iterable<String> ids) {
-        return userDao.findAllById(ids);
-    }
-
-    @Override
-    public Page<User> findAll(Pageable pageable) {
-        return userDao.findAll(pageable);
-    }
-
-    @Override
-    public Page<User> findAll(Specification<User> spec, Pageable pageable) {
-        return userDao.findAll(spec, pageable);
-    }
-
-    @Override
-    public User findOne(Specification<User> spec) {
-        return userDao.findOne(spec).orElse(null);
-    }
-
-    @Override
-    public long count() {
-        return userDao.count();
-    }
-
-    @Override
-    public long count(Specification<User> spec) {
-        return userDao.count(spec);
-    }
-
-    @Override
-    public boolean exists(String id) {
-        return userDao.existsById(id);
-    }
-
-
-    @Override
-    public void save(User entity) {
-        if (entity.getId() == null) {
-            String newId;
-            do {
-                newId = generateId("User");
-            } while (userDao.existsById(newId));
-            entity.setId(newId);
-        }
-        userDao.save(entity);
-    }
-
-    @Override
-    public void save(List<User> entities) {
-        entities.forEach(entity -> {
-            if (entity.getId() == null) {
-                String newId;
-                do {
-                    newId = generateId("User");
-                } while (userDao.existsById(newId));
-                entity.setId(newId);
-            }
-        });
-        userDao.saveAll(entities);
-    }
-
-    @Override
-    public void update(User user) {
-        userDao.save(user);
-    }
-
-    @Override
-    public void delete(String id) {
-        userDao.deleteById(id);
-    }
-
-    @Override
-    public void deleteByIds(List<String> ids) {
-        userDao.deleteAllById(ids);
-    }
-
-    @Override
-    public void delete(User[] entities) {
-        userDao.deleteAll(Arrays.asList(entities));
-    }
-
-    @Override
-    public void delete(Iterable<User> entities) {
-        userDao.deleteAll(entities);
-    }
-
-    @Override
-    public void delete(User entity) {
-        userDao.delete(entity);
-    }
-
-    @Override
-    public void deleteAll() {
-        userDao.deleteAll();
-    }
-
-    @Override
-    public List<User> findList(Specification<User> spec) {
-        return userDao.findAll(spec);
-    }
-
-    @Override
-    public List<User> findList(Specification<User> spec, Sort sort) {
-        return userDao.findAll(spec, sort);
-    }
-
-    @Override
-    public void flush() {
-        userDao.flush();
+        List<User> users = userDao.findAll();
+        return users;
     }
 
     public Optional<User> getUserByNickName(String nickName) {

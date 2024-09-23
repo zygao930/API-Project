@@ -23,4 +23,8 @@ public class CommonException extends Exception {
         this.code = code;
         this.message = message;
     }
+
+    public int getStatus() {
+        return 0;
+    }
 }

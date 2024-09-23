@@ -58,4 +58,5 @@ public class Product implements BaseEntity {
 
     @Column(name = "UPDATE_TIME", nullable = false)
     private LocalDate updateTime;
+
 }
