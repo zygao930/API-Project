@@ -2,6 +2,7 @@ package com.project.project.service.EntityService;
 
 import com.project.project.dao.ProductDao;
 import com.project.project.entity.Product;
+import com.project.project.entity.User;
 import com.project.project.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -97,10 +98,11 @@ public class ProductService implements BaseService<Product, String> {
     }
 
     @Override
-    public Product update(Product entity) {
+    public void update(Product entity) {
         // Assuming update is the same as save for simplicity
-        return productDao.save(entity);
+        productDao.save(entity);
     }
+
 
     @Override
     public void delete(String id) {

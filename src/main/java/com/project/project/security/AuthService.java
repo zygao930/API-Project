@@ -54,11 +54,6 @@ public class AuthService {
                 throw new CommonException(404, "User not found");
             }
 
-            // Normally, you would validate the password here
-            // String password = loginRequest.getPassword();
-            // if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-            //    throw new CommonException(401, "Invalid username or password");
-            // }
 
             // Generate and save token in Redis
             String token = tokenService.generateToken(userDetails);

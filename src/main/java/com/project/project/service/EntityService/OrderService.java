@@ -2,6 +2,7 @@ package com.project.project.service.EntityService;
 
 import com.project.project.dao.OrderDao;
 import com.project.project.entity.Order;
+import com.project.project.entity.User;
 import com.project.project.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -70,6 +71,7 @@ public class OrderService implements BaseService<Order, String> {
         return orderDao.existsById(id);
     }
 
+
     @Override
     public void save(Order entity) {
         if (entity.getId() == null) {
@@ -97,9 +99,9 @@ public class OrderService implements BaseService<Order, String> {
     }
 
     @Override
-    public Order update(Order entity) {
+    public void update(Order entity) {
         // Assuming update is the same as save for simplicity
-        return orderDao.save(entity);
+       orderDao.save(entity);
     }
 
     @Override

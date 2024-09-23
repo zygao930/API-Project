@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -46,5 +47,31 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
+    }
+
+    @GetMapping("/{id}")
+    public List<User> getAllUsers() {
+        return userService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable String id) {
+        return userService.find(id);
+    }
+
+    @PostMapping("/{id}")
+    public void addUser(@RequestBody User user) {
+        userService.save(user);
+    }
+
+    @PutMapping("/{id}")
+    public User updateUser(@RequestBody User user) {
+        userService.update(user);
+        return user;
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable String id) {
+        userService.delete(id);
     }
 }

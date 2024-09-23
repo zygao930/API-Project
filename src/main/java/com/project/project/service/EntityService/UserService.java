@@ -111,6 +111,7 @@ public class UserService implements BaseService<User, String> {
         return userDao.existsById(id);
     }
 
+
     @Override
     public void save(User entity) {
         if (entity.getId() == null) {
@@ -138,9 +139,8 @@ public class UserService implements BaseService<User, String> {
     }
 
     @Override
-    public User update(User entity) {
-        // Assuming update is the same as save for simplicity
-        return userDao.save(entity);
+    public void update(User user) {
+        userDao.save(user);
     }
 
     @Override

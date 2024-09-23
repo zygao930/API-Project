@@ -3,6 +3,9 @@ package com.project.project.service.EntityService;
 import java.io.Serializable;
 import java.util.List;
 
+import com.project.project.entity.Order;
+import com.project.project.entity.Product;
+import com.project.project.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -78,16 +81,18 @@ public interface BaseService <T, I extends Serializable> {
     /**
      * save.
      *
-     * @param entity entity
+     * @param entity
+     * @return
      */
+
     void save(T entity);
 
     /**
      * save.
      *
-     * @param entities entities
+     * @param users
      */
-    void save(List<T> entities);
+    void save(List<T> users);
 
     /**
      * update.
@@ -95,7 +100,8 @@ public interface BaseService <T, I extends Serializable> {
      * @param entity entity
      * @return T
      */
-    T update(T entity);
+    void update(T entity);
+
 
     /**
      * delete.

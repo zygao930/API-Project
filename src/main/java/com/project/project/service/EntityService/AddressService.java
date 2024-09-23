@@ -2,6 +2,7 @@ package com.project.project.service.EntityService;
 
 import com.project.project.dao.AddressDao;
 import com.project.project.entity.Address;
+import com.project.project.entity.User;
 import com.project.project.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -97,9 +98,8 @@ public class AddressService implements BaseService<Address, String> {
     }
 
     @Override
-    public Address update(Address entity) {
-        // Assuming update is the same as save for simplicity
-        return addressDao.save(entity);
+    public void update(Address entity) {
+        addressDao.save(entity);
     }
 
     @Override
