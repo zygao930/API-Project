@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Controller for handling user-related operations like registration.
+ * Controller for handling user-related operations like registration, retrieval, update, and deletion.
  */
 @RestController
 @RequestMapping("/api/user")
@@ -25,9 +25,9 @@ public class UserController {
     /**
      * Endpoint for registering a new user.
      *
-     * @param registrationDTO User registration data transfer object.
-     * @param inputCode       Verification code for the user.
-     * @return Success or failure response.
+     * @param registrationDTO User registration data transfer object containing user details.
+     * @param inputCode       Verification code for the user registration.
+     * @return ResponseEntity with success message or error message.
      */
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody UserRegistrationDTO registrationDTO, String inputCode) {
@@ -39,6 +39,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Endpoint for finding a user by their nickname.
+     *
+     * @param nickName the nickname of the user to be searched.
+     * @return ResponseEntity with user details or a not found message.
+     */
     @GetMapping("/findByNickName")
     public ResponseEntity<String> findByNickName(@RequestParam String nickName) {
         Optional<User> user = userService.getUserByNickName(nickName);
@@ -50,16 +56,33 @@ public class UserController {
         }
     }
 
+    /**
+     * Endpoint for retrieving all users.
+     *
+     * @return List of all registered users.
+     */
     @GetMapping
     public List<User> getAllUsers() {
         return userService.findAll();
     }
 
+    /**
+     * Endpoint for retrieving a user by their ID.
+     *
+     * @param id the ID of the user to be retrieved.
+     * @return the User object associated with the given ID.
+     */
     @GetMapping("/getUserById")
     public User getUserById(@RequestParam String id) {
         return userService.find(id);
     }
 
+    /**
+     * Endpoint for adding a new user.
+     *
+     * @param registrationDTO User registration data transfer object containing user details.
+     * @return ResponseEntity with success message or error message.
+     */
     @PostMapping("/addUser")
     public ResponseEntity<String> addUser(@RequestBody UserRegistrationDTO registrationDTO) {
         try {
@@ -70,6 +93,13 @@ public class UserController {
         }
     }
 
+    /**
+     * Endpoint for updating an existing user.
+     *
+     * @param id              the ID of the user to be updated.
+     * @param registrationDTO User registration data transfer object containing updated user details.
+     * @return ResponseEntity with success message or error message.
+     */
     @PostMapping("/updateUser/{id}")
     public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody UserRegistrationDTO registrationDTO) {
         try {
@@ -80,6 +110,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Endpoint for deleting a user by their ID.
+     *
+     * @param id the ID of the user to be deleted.
+     * @return ResponseEntity with a success message or error message.
+     */
     @DeleteMapping("/deleteUser/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable String id) {
         try {

@@ -1,4 +1,4 @@
-package com.project.project.security;
+package com.project.project.service.security;
 
 import com.project.project.exception.CommonException;
 import org.springframework.beans.factory.annotation.Autowired;

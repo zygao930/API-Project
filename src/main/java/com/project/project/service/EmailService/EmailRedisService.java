@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Service to handle Redis operations for storing and retrieving verification codes.
  */
-@Service("emailRedisService")
-public class RedisService {
+@Service
+public class EmailRedisService {
 
     @Autowired
     private StringRedisTemplate redisTemplate;

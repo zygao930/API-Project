@@ -20,7 +20,7 @@ public class VerificationService {
     private MailService emailService;
 
     @Autowired
-    private RedisService redisService;
+    private EmailRedisService redisService;
 
     /**
      * Sends a verification code via email and stores it in Redis.

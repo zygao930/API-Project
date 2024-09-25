@@ -1,8 +1,7 @@
 package com.project.project.controller;
-import lombok.Data;
-import lombok.Getter;
+
+import com.project.project.service.security.*;
 import com.project.project.exception.CommonException;
-import com.project.project.security.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,15 +10,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static org.springframework.http.ResponseEntity.*;
-
+/**
+ * Controller for handling authentication-related operations including login, logout, and CAPTCHA generation.
+ */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -36,6 +35,11 @@ public class AuthController {
     @Autowired
     private UserInfoService userInfoService;
 
+    /**
+     * Endpoint for generating a CAPTCHA for user authentication.
+     *
+     * @return ResponseEntity containing the CAPTCHA and its key.
+     */
     @PostMapping("/generateCaptcha")
     public ResponseEntity<String> generateCaptcha() {
         String captcha = RandomStringUtils.randomAlphanumeric(6);
@@ -52,6 +56,12 @@ public class AuthController {
         return ResponseEntity.ok(response.toString());
     }
 
+    /**
+     * Endpoint for user login.
+     *
+     * @param loginRequest The login request containing user credentials and CAPTCHA.
+     * @return ResponseEntity with login result message.
+     */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
         // Validate input
@@ -73,6 +83,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Endpoint for retrieving user information based on the provided token.
+     *
+     * @param authorizationHeader The Authorization header containing the Bearer token.
+     * @return ResponseEntity containing user information or error message.
+     */
     @GetMapping("/getUserInfo")
     public ResponseEntity<Map<String, String>> getUserInfo(@RequestHeader("Authorization") String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
@@ -104,19 +120,24 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-
+    /**
+     * Endpoint for user logout.
+     *
+     * @param logoutRequest The logout request containing user details.
+     * @return ResponseEntity with logout result message.
+     */
     @DeleteMapping(value = "/logout")
     public ResponseEntity<String> logout(@RequestBody LogoutRequest logoutRequest) {
         String nickName = logoutRequest.getNickName();
 
-        // 检查用户是否在线
+        // Check if the user is online
         String token = redisTemplate.opsForValue().get(nickName);
         System.out.println("token: " + token);
         if (token == null) {
             return ResponseEntity.status(400).body("User is not logged in.");
         }
 
-        // 删除用户数据
+        // Delete user data from Redis
         boolean deleted = redisTemplate.delete(nickName);
         if (deleted) {
             return ResponseEntity.ok("User logged out successfully.");
@@ -124,7 +145,4 @@ public class AuthController {
             return ResponseEntity.status(400).body("Failed to log out user.");
         }
     }
-
-
 }
-

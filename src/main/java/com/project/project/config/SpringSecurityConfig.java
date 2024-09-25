@@ -1,4 +1,4 @@
-package com.project.project.security;
+package com.project.project.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @EnableWebSecurity
 @Configuration(proxyBeanMethods = false)
-public class springSecurityConfig extends WebSecurityConfigurerAdapter {
+public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder() {

@@ -15,6 +15,6 @@ public class IdGenerator {
      * @return A unique ID string.
      */
     public static String generateId(String entity) {
-        return entity + UUID.randomUUID().toString();
+        return entity + UUID.randomUUID();
     }
 }
