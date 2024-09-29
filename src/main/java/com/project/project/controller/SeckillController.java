@@ -48,4 +48,6 @@ public class SeckillController {
             return "Seckill failed, invalid path.";
         }
     }
+
+
 }

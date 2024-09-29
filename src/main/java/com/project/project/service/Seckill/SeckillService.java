@@ -1,5 +1,6 @@
 package com.project.project.service.Seckill;
 
+import com.project.project.service.EntityService.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ public class SeckillService {
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private ProductService productService;
 
     /**
      * Generates a unique path for a user and a specific goods item during a seckill event.
@@ -50,4 +54,5 @@ public class SeckillService {
 
         return storedPath != null && storedPath.equals(path);
     }
+
 }
